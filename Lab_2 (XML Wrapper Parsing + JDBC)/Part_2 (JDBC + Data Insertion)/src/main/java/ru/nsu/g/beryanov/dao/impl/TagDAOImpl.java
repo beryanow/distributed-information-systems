@@ -16,15 +16,17 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class TagDAOImpl implements TagDAO {
-    private final Connection connection;
+    private final Statement insertStatement;
+    private final PreparedStatement preparedGetTagStatement;
+    private final PreparedStatement preparedCreateTagStatement;
+    private final PreparedStatement preparedBatchCreateTagStatement;
 
     @SneakyThrows
     @Override
     public List<TagDTO> getTags(long nodeId) {
-        PreparedStatement statement = connection.prepareStatement(SQLStatements.GET_TAG_EXPRESSION);
-        statement.setLong(1, nodeId);
+        preparedGetTagStatement.setLong(1, nodeId);
 
-        ResultSet resultSet = statement.executeQuery(SQLStatements.GET_TAG_EXPRESSION);
+        ResultSet resultSet = preparedGetTagStatement.executeQuery(SQLStatements.GET_TAG_EXPRESSION);
         List<TagDTO> tags = new ArrayList<>();
         while (resultSet.next()) {
             tags.add(createTag(resultSet));
@@ -35,8 +37,7 @@ public class TagDAOImpl implements TagDAO {
 
     @SneakyThrows
     @Override
-    public void insertTag(TagDTO tag) {
-        Statement statement = connection.createStatement();
+    public void createInsertTag(TagDTO tag) {
         String sqlRequest = new StringBuilder().append("insert into tags(node_id, key, value) ")
                 .append("values (")
                 .append(tag.getNodeId())
@@ -44,28 +45,26 @@ public class TagDAOImpl implements TagDAO {
                 .append(", ").append("'").append(tag.getValue().replaceAll("'", "''")).append("'")
                 .append(")").toString();
 
-        statement.execute(sqlRequest);
+        insertStatement.execute(sqlRequest);
     }
 
     @SneakyThrows
     @Override
-    public void insertPreparedTag(TagDTO tag) {
-        PreparedStatement statement = connection.prepareStatement(SQLStatements.INSERT_TAG_EXPRESSION);
-        prepareStatement(statement, tag);
+    public void createInsertPreparedStatementTag(TagDTO tag) {
+        prepareStatement(preparedCreateTagStatement, tag);
 
-        statement.execute();
+        preparedCreateTagStatement.execute();
     }
 
     @SneakyThrows
     @Override
-    public void batchInsertTags(List<TagDTO> tagDTOs) {
-        PreparedStatement statement = connection.prepareStatement(SQLStatements.INSERT_TAG_EXPRESSION);
+    public void createBatchPreparedStatementTags(List<TagDTO> tagDTOs) {
         for (TagDTO tag : tagDTOs) {
-            prepareStatement(statement, tag);
-            statement.addBatch();
+            prepareStatement(preparedBatchCreateTagStatement, tag);
+            preparedBatchCreateTagStatement.addBatch();
         }
 
-        statement.executeBatch();
+        preparedBatchCreateTagStatement.executeBatch();
     }
 
     @SneakyThrows

@@ -12,9 +12,11 @@ import ru.nsu.g.beryanov.dao.impl.TagDAOImpl;
 import ru.nsu.g.beryanov.reader.XMLWrapperReader;
 import ru.nsu.g.beryanov.service.NodeProcessingService;
 import ru.nsu.g.beryanov.utility.DataBaseInitializer;
+import ru.nsu.g.beryanov.utility.SQLStatements;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.sql.Connection;
 
 @Log4j2
 public class XMLReaderUsingWrapperApplication {
@@ -29,8 +31,16 @@ public class XMLReaderUsingWrapperApplication {
 
         dataBaseInitializer.initialize(pathToDDLFile);
 
-        NodeDAO nodeDAO = new NodeDAOImpl(dataBaseInitializer.getConnection());
-        TagDAO tagDAO = new TagDAOImpl(dataBaseInitializer.getConnection());
+        Connection connection = dataBaseInitializer.getConnection();
+        NodeDAO nodeDAO = new NodeDAOImpl(connection.createStatement(),
+                connection.prepareStatement(SQLStatements.GET_NODE_EXPRESSION),
+                connection.prepareStatement(SQLStatements.CREATE_NODE_EXPRESSION),
+                connection.prepareStatement(SQLStatements.CREATE_NODE_EXPRESSION));
+
+        TagDAO tagDAO = new TagDAOImpl(connection.createStatement(),
+                connection.prepareStatement(SQLStatements.GET_TAG_EXPRESSION),
+                connection.prepareStatement(SQLStatements.CREATE_TAG_EXPRESSION),
+                connection.prepareStatement(SQLStatements.CREATE_TAG_EXPRESSION));
 
         NodeProcessingService nodeProcessingService = new NodeProcessingService(100000, nodeDAO, tagDAO);
         XMLWrapperReader XMLWrapperReader = new XMLWrapperReader(nodeProcessingService);

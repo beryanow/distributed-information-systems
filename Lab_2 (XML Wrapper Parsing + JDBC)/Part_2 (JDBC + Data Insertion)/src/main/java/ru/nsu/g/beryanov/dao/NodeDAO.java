@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface NodeDAO {
     NodeDTO getNode(long nodeId);
-    void insertNode(NodeDTO nodeDTO);
-    void insertPreparedNode(NodeDTO nodeDTO);
-    void batchInsertNodes(List<NodeDTO> nodeDTOs);
+
+    void createInsertNode(NodeDTO nodeDTO);
+    void createPreparedStatementNode(NodeDTO nodeDTO);
+    void createBatchPreparedStatementNodes(List<NodeDTO> nodeDTOs);
 }

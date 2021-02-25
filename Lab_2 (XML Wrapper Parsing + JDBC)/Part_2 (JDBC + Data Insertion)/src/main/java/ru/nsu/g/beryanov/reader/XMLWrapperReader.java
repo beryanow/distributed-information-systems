@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import ru.nsu.g.beryanov.dto.NodeDTO;
 import ru.nsu.g.beryanov.model.Node;
 import ru.nsu.g.beryanov.model.ObjectFactory;
 import ru.nsu.g.beryanov.service.NodeProcessingService;
@@ -38,11 +37,11 @@ public class XMLWrapperReader {
                 int event = reader.next();
                 if (XMLStreamConstants.START_ELEMENT == event && "node".equals(reader.getLocalName())) {
                     Node node = revealNode(jaxbContext, reader);
-                    nodeProcessingService.putNodeWithPreparedStatement(Converter.convertToNodeDTO(node));
+                    nodeProcessingService.addBatchPreparedStatementNode(Converter.convertToNodeDTO(node));
 
                     // в зависимости от типа
-                    if (nodeProcessingService.getInsertsAmount() == 1000000) {
-                        log.info("Время вставки данных используя Prepared Statements: {} записей в секунду", 1000000.0 / ((double) nodeProcessingService.getInsertTime() / 1000000 / 1000));
+                    if (nodeProcessingService.getInsertsAmount() == 3) {
+                        log.info("Время вставки данных используя INSERT: {} записей в секунду", 300000.0 / ((double) nodeProcessingService.getInsertTime() / 1000000 / 1000));
                         System.exit(0);
                     }
                 }

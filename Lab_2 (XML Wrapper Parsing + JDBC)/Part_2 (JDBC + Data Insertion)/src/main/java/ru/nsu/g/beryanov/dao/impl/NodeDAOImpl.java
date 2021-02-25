@@ -7,7 +7,6 @@ import ru.nsu.g.beryanov.dao.NodeDAO;
 import ru.nsu.g.beryanov.dto.NodeDTO;
 import ru.nsu.g.beryanov.utility.SQLStatements;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -15,15 +14,17 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class NodeDAOImpl implements NodeDAO {
-    private final Connection connection;
+    private final Statement insertStatement;
+    private final PreparedStatement preparedGetNodeStatement;
+    private final PreparedStatement preparedCreateNodeStatement;
+    private final PreparedStatement preparedBatchCreateNodeStatement;
 
     @SneakyThrows
     @Override
     public NodeDTO getNode(long nodeId) {
-        PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_NODE_EXPRESSION);
-        preparedStatement.setLong(1, nodeId);
+        preparedGetNodeStatement.setLong(1, nodeId);
 
-        ResultSet resultSet = preparedStatement.executeQuery(SQLStatements.GET_NODE_EXPRESSION);
+        ResultSet resultSet = preparedGetNodeStatement.executeQuery(SQLStatements.GET_NODE_EXPRESSION);
         if (resultSet.next()) {
             return createNode(resultSet);
         }
@@ -33,9 +34,7 @@ public class NodeDAOImpl implements NodeDAO {
 
     @SneakyThrows
     @Override
-    public void insertNode(NodeDTO nodeDTO) {
-        Statement statement = connection.createStatement();
-
+    public void createInsertNode(NodeDTO nodeDTO) {
         String sqlRequest = new StringBuilder().append("insert into nodes(id, version, timestamp, uid, username, changeset, latitude, longitude) ")
                 .append("values (")
                 .append(nodeDTO.getId())
@@ -48,28 +47,26 @@ public class NodeDAOImpl implements NodeDAO {
                 .append(", ").append(nodeDTO.getLongitude())
                 .append(")").toString();
 
-        statement.execute(sqlRequest);
+        insertStatement.execute(sqlRequest);
     }
 
     @SneakyThrows
     @Override
-    public void insertPreparedNode(NodeDTO nodeDTO) {
-        PreparedStatement statement = connection.prepareStatement(SQLStatements.INSERT_NODE_EXPRESSION);
-        prepareStatement(statement, nodeDTO);
+    public void createPreparedStatementNode(NodeDTO nodeDTO) {
+        prepareStatement(preparedCreateNodeStatement, nodeDTO);
 
-        statement.execute();
+        preparedCreateNodeStatement.execute();
     }
 
     @SneakyThrows
     @Override
-    public void batchInsertNodes(List<NodeDTO> nodeDTOs) {
-        PreparedStatement statement = connection.prepareStatement(SQLStatements.INSERT_NODE_EXPRESSION);
+    public void createBatchPreparedStatementNodes(List<NodeDTO> nodeDTOs) {
         for (NodeDTO nodeDTO : nodeDTOs) {
-            prepareStatement(statement, nodeDTO);
-            statement.addBatch();
+            prepareStatement(preparedBatchCreateNodeStatement, nodeDTO);
+            preparedBatchCreateNodeStatement.addBatch();
         }
 
-        statement.executeBatch();
+        preparedBatchCreateNodeStatement.executeBatch();
     }
 
     @SneakyThrows

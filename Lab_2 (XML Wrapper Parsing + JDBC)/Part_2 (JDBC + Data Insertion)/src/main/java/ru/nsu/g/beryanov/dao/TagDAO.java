@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface TagDAO {
     List<TagDTO> getTags(long nodeId);
-    void insertTag(TagDTO tag);
-    void insertPreparedTag(TagDTO tag);
-    void batchInsertTags(List<TagDTO> tagDTOs);
+
+    void createInsertTag(TagDTO tag);
+    void createInsertPreparedStatementTag(TagDTO tag);
+    void createBatchPreparedStatementTags(List<TagDTO> tagDTOs);
 }

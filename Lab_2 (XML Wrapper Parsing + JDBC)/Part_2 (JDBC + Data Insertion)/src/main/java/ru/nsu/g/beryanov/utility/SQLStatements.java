@@ -10,7 +10,7 @@ public class SQLStatements {
             .append("where id = ?")
             .toString();
 
-    public String INSERT_NODE_EXPRESSION = new StringBuilder()
+    public String CREATE_NODE_EXPRESSION = new StringBuilder()
             .append("insert into nodes(id, version, timestamp, uid, username, changeset, latitude, longitude) ")
             .append("values (?, ?, ?, ?, ?, ?, ?, ?)")
             .toString();
@@ -21,7 +21,7 @@ public class SQLStatements {
             .append("where node_id = ?")
             .toString();
 
-    public String INSERT_TAG_EXPRESSION = new StringBuilder()
+    public String CREATE_TAG_EXPRESSION = new StringBuilder()
             .append("insert into tags(node_id, key, value) ")
             .append("values (?, ?, ?)")
             .toString();

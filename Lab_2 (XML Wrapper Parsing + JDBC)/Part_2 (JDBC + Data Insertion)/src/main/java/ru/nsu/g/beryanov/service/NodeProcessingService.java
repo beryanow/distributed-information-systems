@@ -30,12 +30,12 @@ public class NodeProcessingService {
     private long amount = 0;
     private int insertsAmount = 0;
 
-    public void putNodeWithPreparedStatement(NodeDTO node) {
+    public void addPreparedStatementNode(NodeDTO node) {
         long start = System.nanoTime();
-        nodeDAO.insertPreparedNode(node);
+        nodeDAO.createPreparedStatementNode(node);
 
         for (TagDTO tag : node.getTags()) {
-            tagDAO.insertPreparedTag(tag);
+            tagDAO.createInsertPreparedStatementTag(tag);
         }
 
         insertTime += System.nanoTime() - start;
@@ -43,12 +43,12 @@ public class NodeProcessingService {
         insertsAmount++;
     }
 
-    public void putNode(NodeDTO node) {
+    public void addInsertNode(NodeDTO node) {
         long start = System.nanoTime();
-        nodeDAO.insertNode(node);
+        nodeDAO.createInsertNode(node);
 
         for (TagDTO tag : node.getTags()) {
-            tagDAO.insertTag(tag);
+            tagDAO.createInsertTag(tag);
         }
 
         insertTime += System.nanoTime() - start;
@@ -56,12 +56,12 @@ public class NodeProcessingService {
         insertsAmount++;
     }
 
-    public void putNodeBuffered(NodeDTO node) {
+    public void addBatchPreparedStatementNode(NodeDTO node) {
         nodeBuffer.add(node);
 
         if (nodeBuffer.size() == bufferThreshold) {
             long start = System.nanoTime();
-            flush();
+            flushBuffer();
             insertTime += System.nanoTime() - start;
 
             insertsAmount++;
@@ -69,13 +69,13 @@ public class NodeProcessingService {
 
     }
 
-    public void flush() {
-        nodeDAO.batchInsertNodes(nodeBuffer);
+    public void flushBuffer() {
+        nodeDAO.createBatchPreparedStatementNodes(nodeBuffer);
 
         List<TagDTO> tags = nodeBuffer.stream()
                 .flatMap(node -> node.getTags().stream())
                 .collect(Collectors.toList());
-        tagDAO.batchInsertTags(tags);
+        tagDAO.createBatchPreparedStatementTags(tags);
 
         nodeBuffer.clear();
     }
