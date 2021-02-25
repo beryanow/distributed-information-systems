@@ -1,0 +1,99 @@
+# Заполнение базы данных объектами node
+POST http://localhost:8100/info/initialize
+Content-Type: application/json
+
+{
+  "body": "src/main/resources/RU-NVS.osm.bz2"
+}
+
+###
+
+# Создание кастомного объекта node
+POST http://localhost:8100/info/node/create
+Content-Type: application/json
+Accept: application/json
+
+{
+  "body": {
+    "id": "12345",
+    "version": "1",
+    "timestamp": "2014-02-19T11:42:06Z",
+    "uid": "5443",
+    "username": "example-user",
+    "changeset": "85864183",
+    "latitude": "53.0282215",
+    "longitude": "80.9132436",
+    "tags": [
+      {
+        "key": "country",
+        "value": "US"
+      },
+      {
+        "key": "city",
+        "value": "New York"
+      }
+    ]
+  }
+}
+
+###
+
+# Получение объекта node по id
+GET http://localhost:8100/info/node/get/12345
+Accept: application/json
+
+###
+
+# Обновление объекта node по id
+PUT http://localhost:8100/info/node/update/12345
+Content-Type: application/json
+Accept: application/json
+
+{
+  "body": {
+    "version": "2",
+    "timestamp": "2014-02-19T11:42:06Z",
+    "uid": "5443",
+    "username": "example-user",
+    "changeset": "85864183",
+    "latitude": "53.0282215",
+    "longitude": "80.9132436",
+    "tags": [
+      {
+        "key": "country",
+        "value": "US"
+      },
+      {
+        "key": "city",
+        "value": "New York"
+      },
+      {
+        "key": "state",
+        "value": "New York"
+      }
+    ]
+  }
+}
+
+###
+
+# Удаление объекта node по id
+DELETE http://localhost:8100/info/node/delete/12345
+
+###
+
+# Получение объектов node в заданном радиусе и точке
+GET http://localhost:8100/info/node/search?latitude=53.0282215&longitude=80.9142536&radius=69.0
+Accept: application/json
+
+###
+
+# Получение созданного node
+GET http://localhost:8100/info/node/search?latitude=53.0282215&longitude=80.9142536&radius=69.0
+Accept: application/json
+
+###
+
+# Получение пустого списка node ввиду неподходящего радиуса поиска
+GET http://localhost:8100/info/node/search?latitude=53.0282215&longitude=80.9142536&radius=67.0
+Accept: application/json
