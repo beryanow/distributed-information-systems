@@ -24,3 +24,9 @@ hs_err_pid*
 
 # macOS directory format files 
 .DS_Store
+
+# IDEA files
+.idea
+
+#Gradle files
+.gradle
