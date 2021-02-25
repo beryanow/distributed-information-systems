@@ -8,6 +8,7 @@ import ru.nsu.g.beryanov.dto.NodeDTO;
 import ru.nsu.g.beryanov.model.Node;
 import ru.nsu.g.beryanov.model.ObjectFactory;
 import ru.nsu.g.beryanov.service.NodeProcessingService;
+import ru.nsu.g.beryanov.utility.Converter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -37,7 +38,7 @@ public class XMLWrapperReader {
                 int event = reader.next();
                 if (XMLStreamConstants.START_ELEMENT == event && "node".equals(reader.getLocalName())) {
                     Node node = revealNode(jaxbContext, reader);
-                    nodeProcessingService.putNodeWithPreparedStatement(NodeDTO.addTags(node));
+                    nodeProcessingService.putNodeWithPreparedStatement(Converter.convertToNodeDTO(node));
 
                     // в зависимости от типа
                     if (nodeProcessingService.getInsertsAmount() == 1000000) {
